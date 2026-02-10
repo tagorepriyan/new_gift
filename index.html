@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Teddy Day Surprise</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app" aria-live="polite">
+    <!-- Landing Screen -->
+    <section class="screen screen--active" id="landing" aria-label="Landing screen">
+      <div class="card">
+        <!-- Replace the src with your Pikachu PNG (background removed) -->
+        <img class="character" src="Only pikachu.png" alt="Cute Pikachu" />
+        <p class="message">
+          I already gave you something small and cute… 💛<br />
+          But do you notice everything?
+        </p>
+        <button class="btn" id="startButton" type="button">Start 💫</button>
+      </div>
+    </section>
+
+    <!-- Slideshow Section -->
+    <section class="screen" id="slideshow" aria-label="Slideshow">
+      <div class="slideshow">
+        <div class="slideshow__text"></div>
+        <div class="slide" id="slide" role="button" aria-label="Tap the odd image" tabindex="0">
+          <img class="character" id="slidePikachu" src="Only pikachu.png" alt="Pikachu" />
+          <!-- Subtle hint animation shown only on odd slide -->
+          <div class="tap-hint" id="tapHint" aria-hidden="true">tap</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reveal Screen -->
+    <section class="screen" id="reveal" aria-label="Reveal">
+      <div class="reveal">
+        <div class="reveal__stage" id="revealStage">
+          <!-- Pikachu only image (front) -->
+          <img class="character character--front" id="revealPikachu" src="Only pikachu.png" alt="Pikachu in front" />
+          <!-- Panda only image (3x bigger than Pikachu) -->
+          <img class="character character--back" id="revealPanda" src="only panda.png" alt="Panda" />
+        </div>
+
+        <div class="reveal__text">
+          <h1 class="title">Surpriseeee 🧸❤️<br />Happy Teddy Day!</h1>
+          <p class="subtext">
+            I gave you a small Pikachu…<br />
+            but I wanted to be your biggest teddy 🐼💖
+          </p>
+        </div>
+
+        <div class="floating">
+          <span>💖</span><span>✨</span><span>💖</span>
+        </div>
+
+        <button class="btn" id="hugButton" type="button">Virtual Hug 🤗</button>
+        <p class="hug-text" id="hugText">Sending you the biggest hug ever 💕</p>
+        <div class="final-shot">
+          <!-- Panda + Pikachu together image shown at the end -->
+          <img class="character" src="both panda and pikachu.png" alt="Panda and Pikachu together" />
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Audio (replace file names with your assets) -->
+  <audio id="revealSound" preload="auto">
+    <!-- Replace with your soft pop / chime sound file -->
+    <source src="reveal-chime.mp3" type="audio/mpeg" />
+  </audio>
+
+  <audio id="bgm" preload="auto" loop>
+    <!-- Replace with your light background music (optional) -->
+    <source src="bgm.mp3" type="audio/mpeg" />
+  </audio>
+
+  <script src="script.js"></script>
+</body>
+</html>
