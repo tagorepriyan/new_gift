@@ -1,151 +1,191 @@
-// Teddy Day Surprise Interactions
-// Replace image/audio file names in index.html if yours differ.
+// Teddy Day Surprise Logic
+console.log("Teddy Day Surprise Loaded 🧸");
 
-const landing = document.getElementById("landing");
-const slideshow = document.getElementById("slideshow");
-const reveal = document.getElementById("reveal");
+// --- Configuration ---
+const ASSETS = {
+  pikachu: "Only pikachu.png",
+  pikachuPanda: "both panda and pikachu.png", // Used for the "odd" slide
+  panda: "only panda.png",
+  finalCouple: "both panda and pikachu.png"
+};
 
-const startButton = document.getElementById("startButton");
-const slide = document.getElementById("slide");
-const slidePikachu = document.getElementById("slidePikachu");
-const tapHint = document.getElementById("tapHint");
+const SLIDESHOW_INTERVAL = 2500; // 2.5 seconds per slide
+const ODD_SLIDE_INDEX = 2; // The 3rd slide (index 2) is the special one
 
-const revealPikachu = document.getElementById("revealPikachu");
-const revealPanda = document.getElementById("revealPanda");
-const revealSound = document.getElementById("revealSound");
-const bgm = document.getElementById("bgm");
+// --- DOM Elements ---
+const screens = {
+  landing: document.getElementById("landing"),
+  slideshow: document.getElementById("slideshow"),
+  reveal: document.getElementById("reveal")
+};
 
-const hugButton = document.getElementById("hugButton");
-const hugText = document.getElementById("hugText");
+const elements = {
+  startBtn: document.getElementById("startButton"),
+  slideFrame: document.getElementById("slideFrame"),
+  slideContent: document.getElementById("slide"),
+  slideImage: document.getElementById("slideImage"),
+  tapHint: document.getElementById("tapHint"),
+  progressFill: document.getElementById("progressFill"),
+  revealPikachu: document.getElementById("revealPikachu"),
+  revealPanda: document.getElementById("revealPanda"),
+  revealContent: document.getElementById("revealContent"),
+  hugBtn: document.getElementById("hugButton"),
+  hugText: document.getElementById("hugText")
+};
 
-let slideIndex = 0;
-let slideInterval = null;
-let hintTimeout = null;
-let isPaused = false;
+const audio = {
+  reveal: document.getElementById("revealSound"),
+  bgm: document.getElementById("bgm")
+};
+
+// --- State ---
+let state = {
+  currentSlide: 0,
+  timer: null,
+  progressTimer: null,
+  isPaused: false,
+  foundOddOne: false
+};
 
 const slides = [
-  {
-    bg: "linear-gradient(120deg, #f8c9d6, #f8e9d6)",
-    img: "Only pikachu.png"
-  },
-  {
-    bg: "linear-gradient(120deg, #fff4c2, #f8c9d6)",
-    img: "Only pikachu.png"
-  },
-  {
-    bg: "linear-gradient(120deg, #f8e9d6, #fff4c2)",
-    img: "both panda and pikachu.png"
-  },
-  {
-    bg: "linear-gradient(120deg, #f8c9d6, #fff4c2)",
-    img: "Only pikachu.png"
-  }
+  { color: "#FDE2E4", img: ASSETS.pikachu },     // Pinkish
+  { color: "#FFF1E6", img: ASSETS.pikachu },     // Beigeish
+  { color: "#E2ECE9", img: ASSETS.pikachuPanda }, // Odd one! (Greenish tint)
+  { color: "#FEF9C3", img: ASSETS.pikachu }      // Yellowish
 ];
 
-const oddIndex = 2; // Slide with panda subtly visible
+// --- Functions ---
 
-function setActiveScreen(active) {
-  [landing, slideshow, reveal].forEach((screen) => {
-    screen.classList.toggle("screen--active", screen === active);
-  });
-}
-
-function updateSlide() {
-  const current = slides[slideIndex];
-  slide.style.background = current.bg;
-  slidePikachu.src = current.img;
-  tapHint.classList.remove("tap-hint--show");
-
-  if (slideIndex === oddIndex) {
-    hintTimeout = setTimeout(() => {
-      tapHint.classList.add("tap-hint--show");
-    }, 1800);
-  }
-}
-
-function nextSlide() {
-  if (isPaused) return;
-  slideIndex = (slideIndex + 1) % slides.length;
-  updateSlide();
+function switchScreen(screenName) {
+  // Hide all screens
+  Object.values(screens).forEach(s => s.classList.remove("screen--active"));
+  // Show target screen
+  screens[screenName].classList.add("screen--active");
 }
 
 function startSlideshow() {
-  updateSlide();
-  slideInterval = setInterval(nextSlide, 2400);
+  switchScreen("slideshow");
+  playBGM();
+  runSlideCycle();
 }
 
-function pauseSlideshow() {
-  isPaused = true;
-  if (slideInterval) {
-    clearInterval(slideInterval);
-    slideInterval = null;
+function runSlideCycle() {
+  if (state.foundOddOne) return; // Stop if game over
+
+  showSlide(state.currentSlide);
+  resetProgress();
+
+  // Clear previous timers
+  if (state.timer) clearTimeout(state.timer);
+
+  // Set next slide timer
+  state.timer = setTimeout(() => {
+    state.currentSlide = (state.currentSlide + 1) % slides.length;
+    runSlideCycle();
+  }, SLIDESHOW_INTERVAL);
+}
+
+function showSlide(index) {
+  const slide = slides[index];
+  
+  // Update visuals
+  elements.slideContent.style.backgroundColor = slide.color;
+  elements.slideImage.src = slide.img;
+  
+  // Reset hint
+  elements.tapHint.classList.remove("show");
+
+  // If this is the odd slide, handle specific logic
+  if (index === ODD_SLIDE_INDEX) {
+    // Show hint after a delay if they don't tap immediately
+    setTimeout(() => {
+      if (state.currentSlide === ODD_SLIDE_INDEX && !state.foundOddOne) {
+        elements.tapHint.classList.add("show");
+      }
+    }, 1200);
   }
 }
 
-function resumeSlideshow() {
-  if (!isPaused) return;
-  isPaused = false;
-  if (!slideInterval) {
-    slideInterval = setInterval(nextSlide, 2400);
+function resetProgress() {
+  // Simple CSS animation reset trick
+  elements.progressFill.style.transition = 'none';
+  elements.progressFill.style.width = '0%';
+  setTimeout(() => {
+    elements.progressFill.style.transition = `width ${SLIDESHOW_INTERVAL}ms linear`;
+    elements.progressFill.style.width = '100%';
+  }, 50);
+}
+
+function handleSlideTap() {
+  if (state.currentSlide === ODD_SLIDE_INDEX) {
+    triggerReveal();
+  } else {
+    // Shake effect for wrong tap?
+    elements.slideFrame.animate([
+      { transform: 'translateX(0)' },
+      { transform: 'translateX(-5px)' },
+      { transform: 'translateX(5px)' },
+      { transform: 'translateX(0)' }
+    ], { duration: 300 });
   }
 }
 
 function triggerReveal() {
-  pauseSlideshow();
-  clearTimeout(hintTimeout);
-
-  slide.classList.add("dim");
-  slide.classList.add("fade-out");
-
-  if (revealSound) {
-    revealSound.currentTime = 0;
-    revealSound.play().catch(() => {});
+  state.foundOddOne = true;
+  if (state.timer) clearTimeout(state.timer);
+  
+  // Play sound
+  if (audio.reveal) {
+    audio.reveal.currentTime = 0;
+    audio.reveal.play().catch(e => console.log("Audio play failed:", e));
   }
 
+  // Go to reveal screen
+  switchScreen("reveal");
+
+  // Animate the reveal
   setTimeout(() => {
-    setActiveScreen(reveal);
-    // Reveal animation: Pikachu slides, Panda fades in
-    revealPikachu.classList.add("slide-pikachu-move");
-    revealPanda.classList.add("panda-reveal");
-  }, 800);
+    elements.revealPikachu.classList.add("move-aside");
+    elements.revealPanda.classList.add("reveal-panda-show");
+    elements.revealContent.classList.add("show");
+  }, 500); // Small delay for dramatic effect
 }
 
-startButton.addEventListener("click", () => {
-  setActiveScreen(slideshow);
+function playBGM() {
+  if (audio.bgm) {
+    audio.bgm.volume = 0.3;
+    audio.bgm.play().catch(e => console.log("BGM play failed (autoplay policy):", e));
+  }
+}
+
+// --- Event Listeners ---
+
+elements.startBtn.addEventListener("click", () => {
   startSlideshow();
+});
 
-  // Optional background music (very low volume)
-  if (bgm) {
-    bgm.volume = 0.15;
-    bgm.play().catch(() => {});
+elements.slideContent.addEventListener("click", handleSlideTap);
+
+// Pause on hover/touch
+elements.slideContent.addEventListener("pointerdown", () => {
+  if (state.timer) {
+    clearTimeout(state.timer);
+    elements.progressFill.style.transition = 'none'; // Pause progress
   }
 });
 
-slide.addEventListener("click", () => {
-  if (slideIndex === oddIndex) {
-    triggerReveal();
+// Resume on release (if not the correct one)
+elements.slideContent.addEventListener("pointerup", () => {
+  if (!state.foundOddOne) {
+     // Small delay to prevent instant jumping if they were just checking
+     setTimeout(runSlideCycle, 500);
   }
 });
 
-slide.addEventListener("keydown", (event) => {
-  if (event.key === "Enter" || event.key === " ") {
-    event.preventDefault();
-    if (slideIndex === oddIndex) {
-      triggerReveal();
-    }
-  }
+elements.hugBtn.addEventListener("click", () => {
+  elements.hugText.classList.add("show");
+  elements.revealPanda.classList.add("panda-hug-anim");
+  
+  // Confetti or extra flourish could go here
 });
 
-// Pause slideshow on interaction and resume after
-["pointerdown", "touchstart", "mouseenter"].forEach((eventName) => {
-  slide.addEventListener(eventName, pauseSlideshow);
-});
-
-["pointerup", "touchend", "mouseleave"].forEach((eventName) => {
-  slide.addEventListener(eventName, resumeSlideshow);
-});
-
-hugButton.addEventListener("click", () => {
-  revealPanda.classList.add("hug");
-  hugText.classList.add("hug-text--show");
-});

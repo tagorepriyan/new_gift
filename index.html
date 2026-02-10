@@ -1,81 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Teddy Day Surprise</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Teddy Day Surprise 🧸</title>
+
+  <!-- Preconnect for fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@400;600;700&display=swap"
+    rel="stylesheet">
+
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
+  <div class="background-decorations">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+  </div>
+
   <main class="app" aria-live="polite">
     <!-- Landing Screen -->
-    <section class="screen screen--active" id="landing" aria-label="Landing screen">
-      <div class="card">
-        <!-- Replace the src with your Pikachu PNG (background removed) -->
-        <img class="character" src="Only pikachu.png" alt="Cute Pikachu" />
-        <p class="message">
-          I already gave you something small and cute… 💛<br />
-          But do you notice everything?
-        </p>
-        <button class="btn" id="startButton" type="button">Start 💫</button>
+    <section class="screen screen--active" id="landing">
+      <div class="content-wrapper fade-in-up">
+        <div class="image-container bounce-hover">
+          <img class="character" src="Only pikachu.png" alt="Cute Pikachu" />
+        </div>
+        <div class="text-card">
+          <p class="message">
+            I already gave you something small and cute… 💛<br />
+            <span class="sub-message">But do you notice <strong>everything</strong>?</span>
+          </p>
+          <button class="btn btn-primary pulse-anim" id="startButton" type="button">
+            Start the Magic 💫
+          </button>
+        </div>
       </div>
     </section>
 
     <!-- Slideshow Section -->
-    <section class="screen" id="slideshow" aria-label="Slideshow">
-      <div class="slideshow">
-        <div class="slideshow__text"></div>
-        <div class="slide" id="slide" role="button" aria-label="Tap the odd image" tabindex="0">
-          <img class="character" id="slidePikachu" src="Only pikachu.png" alt="Pikachu" />
-          <!-- Subtle hint animation shown only on odd slide -->
-          <div class="tap-hint" id="tapHint" aria-hidden="true">tap</div>
+    <section class="screen" id="slideshow">
+      <div class="slideshow-container">
+        <h2 class="game-instruction">Find the odd one out... 👀</h2>
+
+        <div class="slide-frame" id="slideFrame">
+          <div class="slide-content" id="slide" role="button" tabindex="0">
+            <div class="character-wrapper">
+              <img class="character-slide" id="slideImage" src="Only pikachu.png" alt="Pikachu" />
+            </div>
+            <!-- Subtle hint animation -->
+            <div class="tap-hint" id="tapHint">tap here!</div>
+          </div>
+        </div>
+
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
         </div>
       </div>
     </section>
 
     <!-- Reveal Screen -->
-    <section class="screen" id="reveal" aria-label="Reveal">
-      <div class="reveal">
-        <div class="reveal__stage" id="revealStage">
-          <!-- Pikachu only image (front) -->
-          <img class="character character--front" id="revealPikachu" src="Only pikachu.png" alt="Pikachu in front" />
-          <!-- Panda only image (3x bigger than Pikachu) -->
-          <img class="character character--back" id="revealPanda" src="only panda.png" alt="Panda" />
+    <section class="screen" id="reveal">
+      <div class="reveal-container">
+        <div class="reveal-stage">
+          <!-- Pikachu (Front) -->
+          <img class="character character-front" id="revealPikachu" src="Only pikachu.png" alt="Pikachu" />
+          <!-- Panda (Back - Hidden initially) -->
+          <img class="character character-back" id="revealPanda" src="only panda.png" alt="Panda" />
         </div>
 
-        <div class="reveal__text">
-          <h1 class="title">Surpriseeee 🧸❤️<br />Happy Teddy Day!</h1>
-          <p class="subtext">
+        <div class="reveal-content" id="revealContent">
+          <h1 class="title-text">Surpriseeee! 🧸❤️<br /><span class="highlight">Happy Teddy Day!</span></h1>
+          <p class="story-text">
             I gave you a small Pikachu…<br />
-            but I wanted to be your biggest teddy 🐼💖
+            but I wanted to be your <span class="accent-text">biggest teddy</span> 🐼💖
           </p>
-        </div>
 
-        <div class="floating">
-          <span>💖</span><span>✨</span><span>💖</span>
-        </div>
+          <div class="floating-hearts">
+            <span>💖</span><span>✨</span><span>🧸</span><span>💕</span>
+          </div>
 
-        <button class="btn" id="hugButton" type="button">Virtual Hug 🤗</button>
-        <p class="hug-text" id="hugText">Sending you the biggest hug ever 💕</p>
-        <div class="final-shot">
-          <!-- Panda + Pikachu together image shown at the end -->
-          <img class="character" src="both panda and pikachu.png" alt="Panda and Pikachu together" />
+          <button class="btn btn-secondary" id="hugButton" type="button">
+            Send a Virtual Hug 🤗
+          </button>
+
+          <p class="hug-message" id="hugText">Sending you the biggest hug ever! 💕</p>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- Audio (replace file names with your assets) -->
+  <!-- Audio Elements -->
   <audio id="revealSound" preload="auto">
-    <!-- Replace with your soft pop / chime sound file -->
     <source src="reveal-chime.mp3" type="audio/mpeg" />
   </audio>
 
   <audio id="bgm" preload="auto" loop>
-    <!-- Replace with your light background music (optional) -->
     <source src="bgm.mp3" type="audio/mpeg" />
   </audio>
 
   <script src="script.js"></script>
 </body>
+
 </html>
